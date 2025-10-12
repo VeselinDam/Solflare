@@ -7,10 +7,6 @@ import type { ChainablePromiseElement } from 'webdriverio';
  */
 class CreateWallet extends Page {
 
-    public open() {
-        return super.open('');
-    }
-
     public get mainPageTitle(): ChainablePromiseElement {
         return $('//h1[contains(normalize-space(.),"Keys to Your Kingdom")]');
     }
