@@ -1,3 +1,30 @@
+const browserParam = process.env.BROWSER || 'chrome';
+
+let capabilities = [];
+
+if (browserParam === 'all') {
+    capabilities = [
+        {
+            browserName: 'chrome',
+            'goog:chromeOptions': { args: ['--start-maximized'] },
+        },
+        {
+            browserName: 'firefox',
+            'moz:firefoxOptions': {},
+        },
+    ];
+} else {
+    capabilities = [
+        {
+            browserName: browserParam,
+            'goog:chromeOptions':
+                browserParam === 'chrome' ? { args: ['--start-maximized'] } : undefined,
+            'moz:firefoxOptions':
+                browserParam === 'firefox' ? {} : undefined,
+        },
+    ];
+}
+
 export const config: WebdriverIO.Config = {
     //
     // ====================
@@ -6,7 +33,7 @@ export const config: WebdriverIO.Config = {
     // WebdriverIO supports running e2e tests as well as unit and component tests.
     runner: 'local',
     tsConfigPath: './tsconfig.json',
-    
+
     //
     // ==================
     // Specify Test Files
@@ -51,9 +78,11 @@ export const config: WebdriverIO.Config = {
     // Sauce Labs platform configurator - a great tool to configure your capabilities:
     // https://saucelabs.com/platform/platform-configurator
     //
-    capabilities: [{
-        browserName: 'chrome'
-    }],
+    capabilities,
+
+    before: async function () {
+        await browser.maximizeWindow();
+    },
 
     //
     // ===================
@@ -112,7 +141,7 @@ export const config: WebdriverIO.Config = {
     // Make sure you have the wdio adapter package for the specific framework installed
     // before running any tests.
     framework: 'mocha',
-    
+
     //
     // The number of times to retry the entire specfile when it fails as a whole
     // specFileRetries: 1,
@@ -126,7 +155,7 @@ export const config: WebdriverIO.Config = {
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
     // see also: https://webdriver.io/docs/dot-reporter
-    reporters: ['spec',['allure', {outputDir: 'allure-results'}]],
+    reporters: ['spec', ['allure', { outputDir: 'allure-results' }]],
 
     // Options to be passed to Mocha.
     // See the full list at http://mochajs.org/
@@ -229,7 +258,7 @@ export const config: WebdriverIO.Config = {
      * @param {boolean} result.passed    true if test has passed, otherwise false
      * @param {object}  result.retries   information about spec related retries, e.g. `{ attempts: 0, limit: 0 }`
      */
-    afterTest: async function(test, context, { error, result, duration, passed, retries }) {
+    afterTest: async function (test, context, { error, result, duration, passed, retries }) {
         if (!passed) {
             await browser.takeScreenshot();
         }
