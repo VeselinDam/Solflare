@@ -43,11 +43,6 @@ class WalletManagementPage extends Page {
         return $$('//div[starts-with(@data-testid, "virtuoso-item-list")] //span[@class="_9rd95r0"]');
     }
 
-    public async getElementText(element: ReturnType<typeof $>): Promise<string> {
-        await this.waitExist(element);
-        return this.text(element);
-    }
-
     public async clickOnAddIconButton(): Promise<void> {
         await this.waitClickable(this.addIconButton);
         await this.click(this.addIconButton);

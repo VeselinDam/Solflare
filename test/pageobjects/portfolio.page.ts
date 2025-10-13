@@ -16,11 +16,6 @@ class PortfolioPage extends Page {
         return $('[data-testid="section-wallet-picker"]').$('span=MW');
     }
 
-    public async getPageTitleText(): Promise<string> {
-        await this.waitExist(this.pageTitle);
-        return this.text(this.pageTitle);
-    }
-
     public async clickOnwalletManagementAvatar(): Promise<typeof WalletManagementPage> {
         await this.waitClickable(this.walletManagementAvatar);
         await this.click(this.walletManagementAvatar);

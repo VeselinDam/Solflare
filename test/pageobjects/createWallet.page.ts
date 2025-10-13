@@ -57,21 +57,6 @@ class CreateWallet extends Page {
         await this.click(this.continueButton);
     }
 
-    public async getMainPageTitleText(): Promise<string> {
-        await this.waitExist(this.mainPageTitle, 10000);
-        return await this.mainPageTitle.getText();
-    }
-
-    public async getPasswordPageTitleText(): Promise<string> {
-        await this.waitExist(this.passwordPageTitle, 10000);
-        return await this.text(this.passwordPageTitle);
-    }
-
-    public async getRecoveryPhraseTitleText(): Promise<string> {
-        await this.waitExist(this.recoveryPhraseTitle, 10000);
-        return await this.text(this.recoveryPhraseTitle);
-    }
-
     public async fillPasswordField(password: string): Promise<void> {
         await this.fillInputField(this.newPasswordInputField, password);
     }

@@ -20,11 +20,6 @@ class HomePage extends Page {
         return $('[data-testid="btn-need-new-wallet"]');
     }
 
-    public async getPageTitleText(): Promise<string> {
-        await this.waitExist(this.pageTitle);
-        return this.text(this.pageTitle);
-    }
-
     public async clickOnNeedNewWalletButton(): Promise<typeof CreateWallet> {
         await this.click(this.needNewWalletButton);
         return CreateWallet;

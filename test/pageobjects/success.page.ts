@@ -16,11 +16,6 @@ class SuccessPage extends Page {
         return $('[data-testid="btn-explore"]');
     }
 
-    public async getPageTitleText(): Promise<string> {
-        await this.waitExist(this.pageTitle);
-        return this.text(this.pageTitle);
-    }
-
     public async clickOnAgreeLetsGoButton(): Promise<typeof PortfolioPage> {
         await this.waitClickable(this.agreeLetsGoButton);
         await this.click(this.agreeLetsGoButton);
