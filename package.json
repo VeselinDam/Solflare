@@ -20,5 +20,8 @@
     "@wdio/mocha-framework": "^9.20.0",
     "@wdio/spec-reporter": "^9.20.0",
     "cross-env": "^10.1.0"
+  },
+  "dependencies": {
+    "winston": "^3.18.3"
   }
 }

@@ -1,26 +1,73 @@
-const browserParam = process.env.BROWSER || 'chrome';
+import * as fs from 'fs';
+import * as path from 'path';
 
-let capabilities = [];
+/**
+ * Determines browser capabilities and launch options dynamically
+ * based on environment variables.
+ *
+ * Environment variables:
+ * - `BROWSER`: defines which browser to use (`chrome`, `firefox`, or `all`).
+ *   Defaults to `chrome` if not provided.
+ * - `HEADLESS`: when set to `'true'`, runs the browser in headless mode.
+ *
+ * For Chrome:
+ * - In headless mode, it uses `--window-size=1920,1080` for consistent viewport size.
+ * - In GUI mode, it launches maximized.
+ *
+ * For Firefox:
+ * - In headless mode, uses the `-headless` flag (viewport size is later set in `before` hook).
+ * - In GUI mode, no special arguments are needed.
+ *
+ * When `BROWSER=all` is set, both Chrome and Firefox run sequentially (each with a single instance).
+ *
+ * This approach makes the configuration flexible for local runs (GUI)
+ * and CI/CD pipelines (headless), keeping capability definitions DRY and centralized.
+ *
+ * @constant
+ * @type {string}
+ */
+const browserParam = process.env.BROWSER || 'chrome';
+const isHeadless = process.env.HEADLESS === 'true';
+
+const chromeArgsHeadless = ['--headless=new', '--disable-gpu', '--window-size=1920,1080'];
+const chromeArgsGui = ['--start-maximized'];
+
+const firefoxArgsHeadless = ['-headless'];
+const firefoxArgsGui: string[] = [];
+
+/**
+ * Dynamic WebdriverIO capabilities array.
+ *
+ * Depending on the selected browser(s), populates the array with proper
+ * `goog:chromeOptions` or `moz:firefoxOptions`.
+ *
+ * @constant
+ * @type {WebdriverIO.Capabilities[]}
+ */
+let capabilities: any[] = [];
 
 if (browserParam === 'all') {
     capabilities = [
         {
             browserName: 'chrome',
-            'goog:chromeOptions': { args: ['--start-maximized'] },
+            maxInstances: 1,
+            'goog:chromeOptions': { args: isHeadless ? chromeArgsHeadless : chromeArgsGui },
         },
         {
             browserName: 'firefox',
-            'moz:firefoxOptions': {},
+            maxInstances: 1,
+            'moz:firefoxOptions': { args: isHeadless ? firefoxArgsHeadless : firefoxArgsGui },
         },
     ];
 } else {
     capabilities = [
         {
             browserName: browserParam,
+            maxInstances: 1,
             'goog:chromeOptions':
-                browserParam === 'chrome' ? { args: ['--start-maximized'] } : undefined,
+                browserParam === 'chrome' ? { args: isHeadless ? chromeArgsHeadless : chromeArgsGui } : undefined,
             'moz:firefoxOptions':
-                browserParam === 'firefox' ? {} : undefined,
+                browserParam === 'firefox' ? { args: isHeadless ? firefoxArgsHeadless : firefoxArgsGui } : undefined,
         },
     ];
 }
@@ -72,17 +119,13 @@ export const config: WebdriverIO.Config = {
     // and 30 processes will get spawned. The property handles how many capabilities
     // from the same test should run tests.
     //
-    maxInstances: 5,
+    maxInstances: 1,
     //
     // If you have trouble getting all important capabilities together, check out the
     // Sauce Labs platform configurator - a great tool to configure your capabilities:
     // https://saucelabs.com/platform/platform-configurator
     //
     capabilities,
-
-    before: async function () {
-        await browser.maximizeWindow();
-    },
 
     //
     // ===================
@@ -248,19 +291,72 @@ export const config: WebdriverIO.Config = {
      */
     // afterHook: function (test, context, { error, result, duration, passed, retries }, hookName) {
     // },
-    /**
-     * Function to be executed after a test (in Mocha/Jasmine only)
-     * @param {object}  test             test object
-     * @param {object}  context          scope object the test was executed with
-     * @param {Error}   result.error     error object in case the test fails, otherwise `undefined`
-     * @param {*}       result.result    return object of test function
-     * @param {number}  result.duration  duration of test
-     * @param {boolean} result.passed    true if test has passed, otherwise false
-     * @param {object}  result.retries   information about spec related retries, e.g. `{ attempts: 0, limit: 0 }`
+    
+        /**
+     * WebdriverIO lifecycle hook that runs before any test execution begins.
+     *
+     * This hook ensures consistent browser viewport sizing across different environments
+     * and handles differences between headless and GUI modes for Chrome and Firefox.
+     *
+     * Behavior:
+     * - **Firefox (headless mode):**
+     *   Firefox ignores window size arguments passed via capabilities (e.g. `--width` / `--height`),
+     *   so the viewport must be explicitly set using `browser.setWindowSize(1920, 1080)`.
+     * - **All browsers (GUI mode):**
+     *   Maximizes the browser window to ensure all page elements are visible
+     *   during local or interactive test runs.
+     * - **Chrome (headless mode):**
+     *   No manual sizing is needed because `--window-size=1920,1080` is already passed
+     *   through `goog:chromeOptions` in the capabilities.
+     *
+     * This setup helps prevent layout-related test flakiness and ensures screenshots,
+     * element positions, and viewport-dependent behaviors remain consistent.
+     *
+     * @async
+     * @function before
      */
-    afterTest: async function (test, context, { error, result, duration, passed, retries }) {
+    before: async function () {
+        const browserName = (await browser.capabilities.browserName || '').toLowerCase();
+
+        if (browserName === 'firefox' && isHeadless) {
+            await browser.setWindowSize(1920, 1080);
+        } else if (!isHeadless) {
+            await browser.maximizeWindow();
+        }
+    },
+
+        /**
+     * WebdriverIO lifecycle hook that runs after each test (`it` block).
+     *
+     * Captures additional debugging artifacts when a test fails:
+     * - Saves a screenshot and page source in the local `./artifacts` directory.
+     * - Attaches both the screenshot and the HTML source to the Allure report
+     *   to help with debugging and post-run analysis.
+     *
+     * Automatically creates the artifacts directory if it doesn’t exist.
+     * If the Allure reporter is not available, the process silently continues
+     * without interrupting the test flow.
+     *
+     * @async
+     * @function afterTest
+     * @param {object} test - The test object containing details such as test title.
+     * @param {object} context - Contains test execution info.
+     * @param {boolean} context.passed - Indicates whether the test passed or failed.
+     */
+
+    afterTest: async function (test, _context, { passed }) {
         if (!passed) {
-            await browser.takeScreenshot();
+            const dir = path.resolve('./artifacts');
+            if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+
+            const png = await browser.takeScreenshot();
+            await browser.saveScreenshot(`./artifacts/${Date.now()}_${test.title}.png`);
+            try {
+                const { default: allure } = await import('@wdio/allure-reporter');
+                allure.addAttachment('Screenshot on Fail', Buffer.from(png, 'base64'), 'image/png');
+                const html = await browser.getPageSource();
+                allure.addAttachment('Page Source', html, 'text/html');
+            } catch { }
         }
     },
 
