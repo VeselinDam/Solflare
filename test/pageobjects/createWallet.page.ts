@@ -11,7 +11,7 @@ class CreateWallet extends Page {
         return $('//h1[contains(normalize-space(.),"Keys to Your Kingdom")]');
     }
 
-    public get newPasswordInputField(){
+    public get newPasswordInputField() {
         return $('[data-testid="input-new-password"]');
     }
 
@@ -47,35 +47,37 @@ class CreateWallet extends Page {
         return $('[data-testid="btn-saved-my-recovery-phrase"]');
     }
 
-    public async clickSaveMyRecoveryPhraseButton(): Promise<void> {
-        await this.saveMyRecoveryPhraseButton.waitForClickable({ timeout: 10000 });
-        await this.saveMyRecoveryPhraseButton.click();
+    public async clickOnSaveMyRecoveryPhraseButton(): Promise<void> {
+        await this.waitClickable(this.saveMyRecoveryPhraseButton);
+        await this.click(this.saveMyRecoveryPhraseButton);
     }
 
     public async clickOnContinueButton(): Promise<void> {
-        await this.continueButton.waitForClickable({ timeout: 10000 });
-        await this.continueButton.click();
+        await this.waitClickable(this.continueButton);
+        await this.click(this.continueButton);
     }
 
     public async getMainPageTitleText(): Promise<string> {
-        await this.mainPageTitle.waitForExist({ timeout: 10000 });
+        await this.waitExist(this.mainPageTitle, 10000);
         return await this.mainPageTitle.getText();
     }
 
     public async getPasswordPageTitleText(): Promise<string> {
-        await this.passwordPageTitle.waitForExist({ timeout: 10000 });
-        return await this.passwordPageTitle.getText();
+        await this.waitExist(this.passwordPageTitle, 10000);
+        return await this.text(this.passwordPageTitle);
     }
 
     public async getRecoveryPhraseTitleText(): Promise<string> {
-        await this.recoveryPhraseTitle.waitForExist({ timeout: 10000 });
-        return await this.recoveryPhraseTitle.getText();
+        await this.waitExist(this.recoveryPhraseTitle, 10000);
+        return await this.text(this.recoveryPhraseTitle);
     }
 
-    public async fillPasswordInputField(passwordField: ReturnType<typeof $>, password: string): Promise<void> {
-        await passwordField.click();
-        await passwordField.clearValue();
-        await passwordField.setValue(password);
+    public async fillPasswordField(password: string): Promise<void> {
+        await this.fillInputField(this.newPasswordInputField, password);
+    }
+
+    public async fillRepeatPasswordInputFieldField(repeatPassword: string): Promise<void> {
+        await this.fillInputField(this.repeatPasswordInputField, repeatPassword);
     }
 
     /**
@@ -104,19 +106,19 @@ class CreateWallet extends Page {
     }
 
     public async fillRecoveryPhraseInputFields(values: string[]): Promise<void> {
-        const sel = this.comfirmRecoveryPhraseLocator;
+        const element = this.comfirmRecoveryPhraseLocator;
 
         await browser.waitUntil(async () => {
             const count = await browser.execute((selector: string) => {
                 return document.querySelectorAll(selector).length;
-            }, sel);
+            }, element);
             return count >= values.length;
         }, {
             timeout: 10000,
             timeoutMsg: 'Input recovery phrases not present',
         });
 
-        const targets = (await $$(sel)) as unknown as WebdriverIO.Element[];
+        const targets = (await $$(element)) as unknown as WebdriverIO.Element[];
 
         const n = Math.min(values.length, targets.length);
         for (let i = 0; i < n; i++) {

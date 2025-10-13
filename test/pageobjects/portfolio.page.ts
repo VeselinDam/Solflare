@@ -17,13 +17,13 @@ class PortfolioPage extends Page {
     }
 
     public async getPageTitleText(): Promise<string> {
-        await this.pageTitle.waitForExist({ timeout: 10000 });
-        return this.pageTitle.getText();
+        await this.waitExist(this.pageTitle);
+        return this.text(this.pageTitle);
     }
 
     public async clickOnwalletManagementAvatar(): Promise<typeof WalletManagementPage> {
-        await this.walletManagementAvatar.waitForClickable({ timeout: 10000 });
-        await this.walletManagementAvatar.click();
+        await this.waitClickable(this.walletManagementAvatar);
+        await this.click(this.walletManagementAvatar);
         return WalletManagementPage;
     }
 }

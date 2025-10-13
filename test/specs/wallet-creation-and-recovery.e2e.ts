@@ -8,13 +8,13 @@ describe('Solflare Wallet Creation', () => {
 
         const pageTitleText = await HomePage.getPageTitleText();
         await expect(pageTitleText).toEqual('YOUR WALLET. YOUR KINGDOM.');
-        const createWallet = await HomePage.clickNeedNewWalletButton();
+        const createWallet = await HomePage.clickOnNeedNewWalletButton();
 
         // Verify that we are on the Create Wallet page
         const mainPageTitleText = await createWallet.getMainPageTitleText();
         expect(mainPageTitleText).toEqual('Keys to Your Kingdom');
         const recoveryPhrases = await createWallet.getAllRecoveryPhrases();
-        await createWallet.clickSaveMyRecoveryPhraseButton();
+        await createWallet.clickOnSaveMyRecoveryPhraseButton();
 
         // Confirm that we are on the recovery phrase confirmation page
         const recoveryPhraseTitleText = await createWallet.getRecoveryPhraseTitleText();
@@ -29,8 +29,8 @@ describe('Solflare Wallet Creation', () => {
         const passwordPageTitleText = await createWallet.getPasswordPageTitleText();
         expect(createWallet.passwordPageTitle).toBeDisabled();
         expect(passwordPageTitleText).toEqual('Set a Password for Your Wallet');
-        await createWallet.fillPasswordInputField(await createWallet.newPasswordInputField, 'Test1234');
-        await createWallet.fillPasswordInputField(await createWallet.repeatPasswordInputField, 'Test1234');
+        await createWallet.fillPasswordField('Test1234');
+        await createWallet.fillRepeatPasswordInputFieldField('Test1234');
         await createWallet.clickOnContinueButton();
 
         //Verify that we are on the Success page

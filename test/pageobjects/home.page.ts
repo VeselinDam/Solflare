@@ -21,13 +21,12 @@ class HomePage extends Page {
     }
 
     public async getPageTitleText(): Promise<string> {
-        await this.pageTitle.waitForExist({ timeout: 10000 });
-        return this.pageTitle.getText();
+        await this.waitExist(this.pageTitle);
+        return this.text(this.pageTitle);
     }
 
-    public async clickNeedNewWalletButton(): Promise<typeof CreateWallet> {
-        await this.needNewWalletButton.waitForClickable({ timeout: 10000 });
-        await this.needNewWalletButton.click();
+    public async clickOnNeedNewWalletButton(): Promise<typeof CreateWallet> {
+        await this.click(this.needNewWalletButton);
         return CreateWallet;
     }
 }

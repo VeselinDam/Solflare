@@ -44,53 +44,51 @@ class WalletManagementPage extends Page {
     }
 
     public async getElementText(element: ReturnType<typeof $>): Promise<string> {
-        await element.waitForExist({ timeout: 10000 });
-        return element.getText();
+        await this.waitExist(element);
+        return this.text(element);
     }
 
     public async clickOnAddIconButton(): Promise<void> {
-        await this.addIconButton.waitForClickable({ timeout: 10000 });
-        await this.addIconButton.click();
+        await this.waitClickable(this.addIconButton);
+        await this.click(this.addIconButton);
     }
 
     public async clickOnManageRecoveryPhraseButton(): Promise<void> {
-        await this.manageRecoveryPhrase.waitForClickable({ timeout: 10000 });
-        await this.manageRecoveryPhrase.click();
+        await this.waitClickable(this.manageRecoveryPhrase);
+        await this.click(this.manageRecoveryPhrase);
     }
 
     public async isSwitchButtonDisabled(index: number): Promise<boolean> {
         const buttons = this.switchButtons;
         const button = buttons[index];
 
-        await button.waitForExist({ timeout: 10000 });
-
-        const ariaDisabled = await button.getAttribute('disabled');
-        return ariaDisabled === 'true';
+        await this.waitExist(button);
+        return !(await button.isEnabled());
     }
 
-    public async getSwitchButtonValue(index: number): Promise<string> {
+    public async getSwitchButtonValue(index: number): Promise<string | null> {
         const buttons = this.switchButtons;
         const button = buttons[index];
-        return button.getAttribute('value');
+        return this.getElementAttribute(button, 'value');
     }
 
     public async getManageRecoveryPhraseWalletTitleText(index: number): Promise<string> {
         const walletsTitles = this.manageRecoveryPhraseWalletTitle;
         const walletTitle = walletsTitles[index];
-        return walletTitle.getText();
+        return this.text(walletTitle);
     }
 
     public async clickOnSwitchButton(index: number): Promise<void> {
         const buttons = this.switchButtons;
         const button = buttons[index];
 
-        await button.waitForClickable({ timeout: 10000 });
-        await button.click();
+        await this.waitClickable(button);
+        await this.click(button);
     }
 
     public async clickOnSaveButton(): Promise<void> {
-        await this.saveButton.waitForClickable({ timeout: 10000 });
-        await this.saveButton.click();
+        await this.waitClickable(this.saveButton);
+        await this.click(this.saveButton);
     }
 
     public async getMyWalletsSubtitles(): Promise<string[]> {
