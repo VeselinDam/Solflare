@@ -1,5 +1,5 @@
 import { browser } from '@wdio/globals'
-import logger from '../utils/logger';
+import logger from '../../utils/logger';
 /**
 * main page object containing all methods, selectors and functionality
 * that is shared across all page objects

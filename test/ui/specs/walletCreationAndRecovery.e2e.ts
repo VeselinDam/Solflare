@@ -1,7 +1,7 @@
 import { expect } from '@wdio/globals';
 import homePage from '../pageobjects/home.page';
 import successPage from '../pageobjects/success.page';
-import logger from '../utils/logger';
+import logger from '../../utils/logger';
 
 describe('Solflare Wallet Creation', () => {
     it('should create new wallet and verify recovery phrase management', async () => {

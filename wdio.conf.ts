@@ -97,7 +97,8 @@ export const config: WebdriverIO.Config = {
     // of the config file unless it's absolute.
     //
     specs: [
-        './test/specs/**/*.ts'
+        './test/ui/specs/**/*.ts',
+        './test/api/specs/**/*.ts'
     ],
     // Patterns to exclude.
     exclude: [
@@ -291,30 +292,30 @@ export const config: WebdriverIO.Config = {
      */
     // afterHook: function (test, context, { error, result, duration, passed, retries }, hookName) {
     // },
-    
-        /**
-     * WebdriverIO lifecycle hook that runs before any test execution begins.
-     *
-     * This hook ensures consistent browser viewport sizing across different environments
-     * and handles differences between headless and GUI modes for Chrome and Firefox.
-     *
-     * Behavior:
-     * - **Firefox (headless mode):**
-     *   Firefox ignores window size arguments passed via capabilities (e.g. `--width` / `--height`),
-     *   so the viewport must be explicitly set using `browser.setWindowSize(1920, 1080)`.
-     * - **All browsers (GUI mode):**
-     *   Maximizes the browser window to ensure all page elements are visible
-     *   during local or interactive test runs.
-     * - **Chrome (headless mode):**
-     *   No manual sizing is needed because `--window-size=1920,1080` is already passed
-     *   through `goog:chromeOptions` in the capabilities.
-     *
-     * This setup helps prevent layout-related test flakiness and ensures screenshots,
-     * element positions, and viewport-dependent behaviors remain consistent.
-     *
-     * @async
-     * @function before
-     */
+
+    /**
+ * WebdriverIO lifecycle hook that runs before any test execution begins.
+ *
+ * This hook ensures consistent browser viewport sizing across different environments
+ * and handles differences between headless and GUI modes for Chrome and Firefox.
+ *
+ * Behavior:
+ * - **Firefox (headless mode):**
+ *   Firefox ignores window size arguments passed via capabilities (e.g. `--width` / `--height`),
+ *   so the viewport must be explicitly set using `browser.setWindowSize(1920, 1080)`.
+ * - **All browsers (GUI mode):**
+ *   Maximizes the browser window to ensure all page elements are visible
+ *   during local or interactive test runs.
+ * - **Chrome (headless mode):**
+ *   No manual sizing is needed because `--window-size=1920,1080` is already passed
+ *   through `goog:chromeOptions` in the capabilities.
+ *
+ * This setup helps prevent layout-related test flakiness and ensures screenshots,
+ * element positions, and viewport-dependent behaviors remain consistent.
+ *
+ * @async
+ * @function before
+ */
     before: async function () {
         const browserName = (await browser.capabilities.browserName || '').toLowerCase();
 
@@ -325,24 +326,24 @@ export const config: WebdriverIO.Config = {
         }
     },
 
-        /**
-     * WebdriverIO lifecycle hook that runs after each test (`it` block).
-     *
-     * Captures additional debugging artifacts when a test fails:
-     * - Saves a screenshot and page source in the local `./artifacts` directory.
-     * - Attaches both the screenshot and the HTML source to the Allure report
-     *   to help with debugging and post-run analysis.
-     *
-     * Automatically creates the artifacts directory if it doesn’t exist.
-     * If the Allure reporter is not available, the process silently continues
-     * without interrupting the test flow.
-     *
-     * @async
-     * @function afterTest
-     * @param {object} test - The test object containing details such as test title.
-     * @param {object} context - Contains test execution info.
-     * @param {boolean} context.passed - Indicates whether the test passed or failed.
-     */
+    /**
+ * WebdriverIO lifecycle hook that runs after each test (`it` block).
+ *
+ * Captures additional debugging artifacts when a test fails:
+ * - Saves a screenshot and page source in the local `./artifacts` directory.
+ * - Attaches both the screenshot and the HTML source to the Allure report
+ *   to help with debugging and post-run analysis.
+ *
+ * Automatically creates the artifacts directory if it doesn’t exist.
+ * If the Allure reporter is not available, the process silently continues
+ * without interrupting the test flow.
+ *
+ * @async
+ * @function afterTest
+ * @param {object} test - The test object containing details such as test title.
+ * @param {object} context - Contains test execution info.
+ * @param {boolean} context.passed - Indicates whether the test passed or failed.
+ */
 
     afterTest: async function (test, _context, { passed }) {
         if (!passed) {
