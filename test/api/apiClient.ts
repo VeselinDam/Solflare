@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import { v4 as uuidv4 } from 'uuid';
 
 const BASE_URL = "https://wallet-api.solflare.com";
 
@@ -9,18 +10,17 @@ export const api: AxiosInstance = axios.create({
   validateStatus: () => true,
 });
 
-api.interceptors.request.use((cfg) => {
-  console.log(`[API] ${cfg.method?.toUpperCase()} ${cfg.baseURL}${cfg.url}`);
-  return cfg;
-});
-api.interceptors.response.use((res) => {
-  console.log(`[API] ${res.status} <- ${res.config.url}`);
-  return res;
-});
+export function setToken() {
+  const authUuid = uuidv4();
+  api.defaults.headers.common["Authorization"] = `Bearer ${authUuid}`;
+  return authUuid;
+}
 
-export async function request<T = any>(
-  cfg: AxiosRequestConfig
+export async function request<T = any>(config: AxiosRequestConfig
 ): Promise<{ status: number; body: T; headers: Record<string, any> }> {
-  const res = await api.request<T>(cfg);
+  const res = await api.request<T>(config);
   return { status: res.status, body: res.data as T, headers: res.headers as any };
 }
+
+export const get = <T = any>(url: string, config?: AxiosRequestConfig) =>
+  request<T>({ ...config, method: "get", url });
