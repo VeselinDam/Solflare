@@ -29,7 +29,7 @@ import * as path from 'path';
 const browserParam = process.env.BROWSER || 'chrome';
 const isHeadless = process.env.HEADLESS === 'true';
 
-const chromeArgsHeadless = ['--headless=new', '--disable-gpu', '--window-size=1920,1080'];
+const chromeArgsHeadless = ['--headless=new', '--disable-gpu', '--window-size=1920,1080', '--no-sandbox', '--disable-dev-shm-usage', '--disable-extensions', '--disable-infobars', '--disable-web-security', '--disable-blink-features=AutomationControlled', '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'];
 const chromeArgsGui = ['--start-maximized'];
 
 const firefoxArgsHeadless = ['-headless'];
