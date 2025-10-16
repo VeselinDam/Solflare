@@ -26,10 +26,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
-      BROWSER: ${{ github.event.inputs.browser }}
-      HEADLESS: ${{ github.event.inputs.headless }}
-      ALLURE_RESULTS: allure-results-${{ github.event.inputs.browser }}
-      ALLURE_REPORT:  allure-report-${{ github.event.inputs.browser }}
+        BROWSER: ${{ github.event.inputs.browser }}
+        HEADLESS: ${{ github.event.inputs.headless }}
+        ALLURE_RESULTS: allure-results
+        ALLURE_REPORT:  allure-report
+
 
     steps:
       - name: Checkout
