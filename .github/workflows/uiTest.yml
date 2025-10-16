@@ -1,0 +1,79 @@
+name: UI Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      browser:
+        type: choice
+        description: "Browser to run"
+        required: true
+        default: chrome
+        options:
+          - chrome
+          - firefox
+      headless:
+        type: boolean
+        description: "Run headless"
+        required: false
+        default: true
+
+concurrency:
+  group: ui-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      BROWSER: ${{ github.event.inputs.browser }}
+      HEADLESS: ${{ github.event.inputs.headless }}
+      ALLURE_RESULTS: allure-results-${{ github.event.inputs.browser }}
+      ALLURE_REPORT:  allure-report-${{ github.event.inputs.browser }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Setup Chrome
+        if: ${{ env.BROWSER == 'chrome' }}
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Setup Firefox
+        if: ${{ env.BROWSER == 'firefox' }}
+        uses: browser-actions/setup-firefox@v1
+
+      - name: Clean previous Allure
+        run: rm -rf "$ALLURE_RESULTS" "$ALLURE_REPORT" || true
+
+      - name: Run UI tests
+        run: |
+          ALLURE_DIR="$ALLURE_RESULTS" BROWSER="$BROWSER" HEADLESS="$HEADLESS" npm run test:ui
+
+      - name: Generate Allure HTML
+        run: npx allure generate --clean "./$ALLURE_RESULTS" -o "./$ALLURE_REPORT"
+
+      - name: Upload Allure results (raw)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-allure-results-${{ env.BROWSER }}
+          path: ${{ env.ALLURE_RESULTS }}
+          retention-days: 7
+
+      - name: Upload Allure report (HTML)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-allure-report-${{ env.BROWSER }}
+          path: ${{ env.ALLURE_REPORT }}
+          retention-days: 7

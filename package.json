@@ -9,6 +9,9 @@
     "test:all": "cross-env BROWSER=all wdio run ./wdio.conf.ts",
     "test:api": "mocha -r ts-node/register --extensions ts -R allure-mocha -O \"resultsDir=allure-results-api,extraReporters=spec\" \"test/api/specs/**/*.ts\""
   },
+  "mocha": {
+    "timeout": 5000
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
