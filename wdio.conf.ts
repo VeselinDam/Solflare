@@ -197,8 +197,17 @@ export const config: WebdriverIO.Config = {
     // The only one supported by default is 'dot'
     // see also: https://webdriver.io/docs/dot-reporter
     //reporters: ['spec', ['allure', { outputDir: 'allure-results' }]],
+    onPrepare: () => {
+    try {
+      fs.rmSync('allure-results', { recursive: true, force: true });
+      fs.rmSync('allure-report',  { recursive: true, force: true });
+    } catch {}
+  },
+    
     reporters: [['allure', {
-        outputDir: 'allure-results'
+        outputDir: 'allure-results',
+        disableWebdriverStepsReporting: true,
+        disableWebdriverScreenshotsReporting: true,
     }]],
 
     // Options to be passed to Mocha.
