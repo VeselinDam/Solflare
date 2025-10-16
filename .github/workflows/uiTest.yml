@@ -47,7 +47,6 @@ jobs:
       - name: Setup Chrome
         if: ${{ env.BROWSER == 'chrome' }}
         uses: browser-actions/setup-chrome@v1
-
       - name: Setup Firefox
         if: ${{ env.BROWSER == 'firefox' }}
         uses: browser-actions/setup-firefox@v1
@@ -55,9 +54,15 @@ jobs:
       - name: Clean previous Allure
         run: rm -rf "$ALLURE_RESULTS" "$ALLURE_REPORT" || true
 
-      - name: Run UI tests
+      - name: Run UI tests (Chrome)
+        if: ${{ env.BROWSER == 'chrome' }}
         run: |
-          ALLURE_DIR="$ALLURE_RESULTS" BROWSER="$BROWSER" HEADLESS="$HEADLESS" npm run test:ui
+          ALLURE_DIR="$ALLURE_RESULTS" HEADLESS="$HEADLESS" npm run test:chrome
+
+      - name: Run UI tests (Firefox)
+        if: ${{ env.BROWSER == 'firefox' }}
+        run: |
+          ALLURE_DIR="$ALLURE_RESULTS" HEADLESS="$HEADLESS" npm run test:firefox
 
       - name: Generate Allure HTML
         run: npx allure generate --clean "./$ALLURE_RESULTS" -o "./$ALLURE_REPORT"
