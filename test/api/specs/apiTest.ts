@@ -1,6 +1,6 @@
-import { get, setToken } from "../apiClient";
+import { get, setToken } from "../client/apiClient";
 import { expect } from 'expect';
-import { saveResponse } from "../utils/fileUtils";
+import { saveResponse } from "../../utils/fileUtils";
 
 describe("Solana API tests", () => {
 

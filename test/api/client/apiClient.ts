@@ -13,7 +13,6 @@ export const api: AxiosInstance = axios.create({
 export function setToken() {
   const authUuid = uuidv4();
   api.defaults.headers.common["Authorization"] = `Bearer ${authUuid}`;
-  return authUuid;
 }
 
 export async function request<T = any>(config: AxiosRequestConfig

@@ -344,11 +344,11 @@ export const config: WebdriverIO.Config = {
 
     afterTest: async function (test, _context, { passed }) {
         if (!passed) {
-            const dir = path.resolve('./artifacts');
+            const dir = path.resolve('./artifacts/screenshots');
             if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
             const png = await browser.takeScreenshot();
-            await browser.saveScreenshot(`./artifacts/${Date.now()}_${test.title}.png`);
+            await browser.saveScreenshot(`./artifacts/screenshots/${Date.now()}_${test.title}.png`);
             try {
                 const { default: allure } = await import('@wdio/allure-reporter');
                 allure.addAttachment('Screenshot on Fail', Buffer.from(png, 'base64'), 'image/png');
