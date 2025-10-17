@@ -1,5 +1,4 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import { v4 as uuidv4 } from 'uuid';
 
 const BASE_URL = "https://wallet-api.solflare.com";
 
@@ -10,8 +9,8 @@ export const api: AxiosInstance = axios.create({
   validateStatus: () => true,
 });
 
-export function setToken() {
-  const authUuid = uuidv4();
+export function setToken(token: string) {
+  const authUuid = token;
   api.defaults.headers.common["Authorization"] = `Bearer ${authUuid}`;
 }
 

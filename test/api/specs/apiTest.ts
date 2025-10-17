@@ -1,14 +1,10 @@
-import { get, setToken } from "../client/apiClient";
+import { get } from "../client/apiClient";
 import { expect } from 'expect';
 import { saveResponse } from "../../utils/fileUtils";
 
 describe("Solana API tests", () => {
 
     const BASE_PATH = "/v3/portfolio/tokens/HuiTegTpNAU7EJXvn95HKEWBdFMtWZYko4yoFVQyCKUS";
-
-    before(() => {
-        setToken();
-    });
 
     it("should test Devnet Token Validation", async () => {
         type TokenAccount = {
