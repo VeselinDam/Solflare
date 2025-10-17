@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as path from 'path';
 
 /**
  * Determines browser capabilities and launch options dynamically

@@ -72,7 +72,7 @@ describe("Solana API tests", () => {
     });
 
     it("should verify that switching from mainnet to devnet and back to mainnet restores the original response.", async () => {
-        type Token = {
+        type TokenName = {
             name?: string;
         };
 
@@ -83,7 +83,7 @@ describe("Solana API tests", () => {
 
         await saveResponse("mainnet-response-1", mainnetResponse1.body);
 
-        const keyOf = (type: Token) =>
+        const keyOf = (type: TokenName) =>
             (type.name ?? "").toLowerCase().trim();
 
         const mainKeys = new Set<string>(mainnetResponse1.body.tokens.map(keyOf).filter(Boolean));
