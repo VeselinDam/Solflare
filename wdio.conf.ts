@@ -198,16 +198,15 @@ export const config: WebdriverIO.Config = {
     // see also: https://webdriver.io/docs/dot-reporter
     //reporters: ['spec', ['allure', { outputDir: 'allure-results' }]],
     onPrepare: () => {
-    try {
-      fs.rmSync('allure-results', { recursive: true, force: true });
-      fs.rmSync('allure-report',  { recursive: true, force: true });
-    } catch {}
-  },
-    
+        try {
+            fs.rmSync('allure-results', { recursive: true, force: true });
+            fs.rmSync('allure-report', { recursive: true, force: true });
+        } catch { }
+    },
+
     reporters: [['allure', {
         outputDir: 'allure-results',
-        disableWebdriverStepsReporting: true,
-        disableWebdriverScreenshotsReporting: true,
+        disableWebdriverScreenshotsReporting: false,
     }]],
 
     // Options to be passed to Mocha.
@@ -336,40 +335,16 @@ export const config: WebdriverIO.Config = {
     },
 
     /**
- * WebdriverIO lifecycle hook that runs after each test (`it` block).
- *
- * Captures additional debugging artifacts when a test fails:
- * - Saves a screenshot and page source in the local `./artifacts` directory.
- * - Attaches both the screenshot and the HTML source to the Allure report
- *   to help with debugging and post-run analysis.
- *
- * Automatically creates the artifacts directory if it doesn’t exist.
- * If the Allure reporter is not available, the process silently continues
- * without interrupting the test flow.
- *
- * @async
- * @function afterTest
- * @param {object} test - The test object containing details such as test title.
- * @param {object} context - Contains test execution info.
- * @param {boolean} context.passed - Indicates whether the test passed or failed.
- */
+    ` * Funtion to be executed after a test (in Mocha/Jasmine). ends.
+    *
+    * If the test failed, takes a screenshot of the browser state at failure time.
+    */
 
-    afterTest: async function (test, _context, { passed }) {
+    afterTest: async function (test, context, { error, result, duration, passed, retries }) {
         if (!passed) {
-            const dir = path.resolve('./artifacts/screenshots');
-            if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-
-            const png = await browser.takeScreenshot();
-            await browser.saveScreenshot(`./artifacts/screenshots/${Date.now()}_${test.title}.png`);
-            try {
-                const { default: allure } = await import('@wdio/allure-reporter');
-                allure.addAttachment('Screenshot on Fail', Buffer.from(png, 'base64'), 'image/png');
-                const html = await browser.getPageSource();
-                allure.addAttachment('Page Source', html, 'text/html');
-            } catch { }
+            await browser.takeScreenshot();
         }
     },
-
 
     /**
      * Hook that gets executed after the suite has ended
