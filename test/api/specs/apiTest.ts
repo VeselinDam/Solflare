@@ -1,10 +1,10 @@
 import { get } from "../client/apiClient";
 import { expect } from 'expect';
 import { saveResponse } from "../../utils/fileUtils";
+import { API_CONFIG } from "../config/apiConfig";
 
 describe("Solana API tests", () => {
-
-    const BASE_PATH = "/v3/portfolio/tokens/HuiTegTpNAU7EJXvn95HKEWBdFMtWZYko4yoFVQyCKUS";
+    const { BASE_PATH, NETWORKS } = API_CONFIG;
 
     it("should test Devnet Token Validation", async () => {
         type TokenAccount = {
@@ -17,10 +17,7 @@ describe("Solana API tests", () => {
             coingeckoId: string | null;
         }
 
-        const response = await get(BASE_PATH,
-            {
-                params: { network: "devnet" }
-            }
+        const response = await get(BASE_PATH, { params: { network: NETWORKS.DEVNET } }
         );
 
         expect(response.status).toBe(200);
@@ -60,9 +57,7 @@ describe("Solana API tests", () => {
     });
 
     it("should break API", async () => {
-        const response = await get(BASE_PATH,
-            { params: { network: "green" } }
-        );
+        const response = await get(BASE_PATH, { params: { network: "green" } });
         expect(response.status).toBe(400);
         expect(response.body.message).toBe('\"network\" must be one of [mainnet, devnet, testnet]');
     });
@@ -72,9 +67,9 @@ describe("Solana API tests", () => {
             name?: string;
         };
 
-        const mainnetResponse1 = await get(BASE_PATH, { params: { network: "mainnet" } });
+        const mainnetResponse1 = await get(BASE_PATH, { params: { network: NETWORKS.MAINNET } });
         expect(mainnetResponse1.status).toBe(200);
-        const devnetResponse = await get(BASE_PATH, { params: { network: "devnet" } });
+        const devnetResponse = await get(BASE_PATH, { params: { network: NETWORKS.DEVNET } });
         expect(devnetResponse.status).toBe(200);
 
         await saveResponse("mainnet-response-1", mainnetResponse1.body);
@@ -92,7 +87,7 @@ describe("Solana API tests", () => {
 
         expect(extrasOnDevnet.length).toBeGreaterThan(0);
 
-        const mainnetResponse2 = await get(BASE_PATH, { params: { network: "mainnet" } });
+        const mainnetResponse2 = await get(BASE_PATH, { params: { network: NETWORKS.MAINNET } });
         expect(mainnetResponse2.status).toBe(200);
 
         await saveResponse("mainnet-response-2", mainnetResponse2.body);
